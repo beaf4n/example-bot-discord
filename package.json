@@ -1,0 +1,36 @@
+{
+    "name": "Devirfan",
+    "version": "14.5.0",
+    "main": "bot.js",
+    "scripts": {
+        "start": "node bot.js",
+        "discord.js": "^12.3.1"
+    },
+    "engines": {
+        "node": "12.x"
+    },
+    "dependencies": {
+        "config": "^3.3.1",
+        "discord-anti-spam": "^2.4.1",
+        "discord.js": "^12.3.1",
+        "discord.js-commando": "^0.10.0",
+        "express": "^4.16.3",
+        "ffmpeg": "^0.0.4",
+        "foreach-timeout": "2.0.2",
+        "https": "^1.0.0",
+        "map": "^1.0.1",
+        "node": "^14.5.0",
+        "node.js": "0.0.1-security",
+        "opusscript": "^0.0.7",
+        "path": "^0.12.7",
+        "quick.db": "^7.1.1",
+        "request": "2.81.0",
+        "superagent": "^5.2.2",
+        "ytdl-core": "^3.1.1",
+        "momentjs": "^2.0.0",
+        "moment": "^2.27.0",
+        "got": "^11.1.3",
+        "new-date": "^1.0.1",
+        "moment-duration-format": "^2.3.2"
+    }
+}
