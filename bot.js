@@ -58,25 +58,6 @@ const antiSpam = new AntiSpam({
     ignoredUsers: [], // Array of User IDs that get ignored.
 });
 
-//Listner Event: User joining the discord server
-bot.on('guildMemberAdd', member => {
-    console.log('User' + member.user.tag + 'has joined the server!');
-
-    var role = member.guild.roles.find('name', 'SUBS');
-    member.addRole(role);
-})
-
-client.on("guildCreate", guild => {
-    console.log(`New guild joined: ${guild.name} (id: ${guild.id}). This guild has ${guild.memberCount} members!`);
-    client.user.setActivity(`Serving ${client.guilds.cache.size} servers`);
-});
-
-client.on("guildDelete", guild => {
-    console.log(`I have been removed from: ${guild.name} (id: ${guild.id})`);
-    client.user.setActivity(`Serving ${client.guilds.cache.size} servers`);
-});
-
-
 client.on("message", async message => {
     if (message.author.bot) return;
 
