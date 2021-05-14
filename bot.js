@@ -22,17 +22,17 @@ const ytdl = require("ytdl-core");
 const opus = require('opusscript');
 const AntiSpam = require('discord-anti-spam');
 const fs = require('fs');
-const format = require("moment-duration-format");
-const db = require("quick.db");
 const config = require("./config.json");
 const Date = require("new-date");
+const format = require("moment-duration-format");
+const nodefetch = require("node-fetch");
 const moment = require('moment');
 const { Command } = require('discord.js-commando')
-client.on('ready', () => console.log(`Logged in as ${client.user.tag}.`));
+client.on('ready', () => console.log(`Aktif Sebagai ${client.user.tag}.`));
 
 client.on('ready', () => {
-    console.log('Bot Lalajovers Sudah Menyala');
-    client.user.setActivity('Ayam Kampus', { type: 'WATCHING'});
+    console.log(`Bot ${client.user.tag} Sudah Menyala`);
+    //client.user.setActivity('🔧 MAINTENANCE | Optimize Script', { type: 'WATCHING'});
 });
 
 //antispam script
@@ -58,6 +58,14 @@ const antiSpam = new AntiSpam({
     ignoredUsers: [], // Array of User IDs that get ignored.
 });
 
+//Listner Event: User joining the discord server
+bot.on('guildMemberAdd', member => {
+    console.log('User' + member.user.tag + 'has joined the server!');
+
+    var role = member.guild.roles.find('name', 'SUBS');
+    member.addRole(role);
+})
+
 client.on("message", async message => {
     if (message.author.bot) return;
 
@@ -79,7 +87,7 @@ client.on("message", async message => {
     
     if (command === "say") {
         message.delete().catch(O_o => {});
-        if (!message.member.roles.cache.some(r => ["La Reine ~", "Mon Amie ~", "BSD SQUAD", "MODS", "Mafia PEKANBARU", "Team Lalajo", "admin"].includes(r.name)))
+        if (!message.member.roles.cache.some(r => ["Your Administrator Roles"].includes(r.name))) // Example "La Reine ~", "Mon Amie ~", "BSD SQUAD", "MODS", "Mafia PEKANBARU", "Team Lalajo", "admin"
         return message.reply("Kamu Tidak Ada Akses Untuk Menggunakan Command Ini!");
       
         const sayMessage = args.join(" ");
@@ -89,7 +97,7 @@ client.on("message", async message => {
     if (command === "kick") {
         let target = message.mentions.members.first() || message.guild.members.cache.get(args[0])
         message.delete().catch(O_o => {});
-        if (!message.member.roles.cache.some(r => ["La Reine ~", "Mon Amie ~", "BSD SQUAD", "MODS", "Mafia PEKANBARU", "Team Lalajo", "admin"].includes(r.name)))
+        if (!message.member.roles.cache.some(r => ["Your Administrator Roles"].includes(r.name))) // Example "La Reine ~", "Mon Amie ~", "BSD SQUAD", "MODS", "Mafia PEKANBARU", "Team Lalajo", "admin"
             return message.reply("Kamu Tidak Ada Akses Untuk Menggunakan Command Ini!");
 
         let member = message.mentions.members.first();
@@ -114,7 +122,7 @@ client.on("message", async message => {
     if (command === "ban") {
         let target = message.mentions.members.first() || message.guild.members.cache.get(args[0])
         message.delete().catch(O_o => {});
-        if (!message.member.roles.cache.some(r => ["La Reine ~", "Mon Amie ~", "BSD SQUAD", "MODS", "Mafia PEKANBARU", "Team Lalajo", "admin"].includes(r.name)))
+        if (!message.member.roles.cache.some(r => ["Your Administrator Roles"].includes(r.name))) // Example "La Reine ~", "Mon Amie ~", "BSD SQUAD", "MODS", "Mafia PEKANBARU", "Team Lalajo", "admin"
             return message.reply("Kamu Tidak Ada Akses Untuk Menggunakan Command Ini!");
 
         let member = message.mentions.members.first();
@@ -150,7 +158,7 @@ client.on("message", async message => {
         if (command === "warn") {
         let target = message.mentions.members.first() || message.guild.members.cache.get(args[0])
         message.delete().catch(O_o => {});
-        if (!message.member.roles.cache.some(r => ["La Reine ~", "Mon Amie ~", "BSD SQUAD", "MODS", "Mafia PEKANBARU", "Team Lalajo", "admin"].includes(r.name)))
+        if (!message.member.roles.cache.some(r => ["Your Administrator Roles"].includes(r.name))) // Example "La Reine ~", "Mon Amie ~", "BSD SQUAD", "MODS", "Mafia PEKANBARU", "Team Lalajo", "admin"
             return message.reply("Kamu Tidak Ada Akses Untuk Menggunakan Command Ini!");
 
         let member = message.mentions.members.first();
@@ -171,51 +179,35 @@ client.on("message", async message => {
     }
 
       if (command === "userinfo") {
-        var embed = new Discord.MessageEmbed()
-        .setAuthor("Informasi Account Discord", message.author.displayAvatarURL())
-        .setColor(Math.floor(Math.random() * (0xFFFFFF + 1)))
-        .addField("Nama", `${message.author.username}#${message.author.discriminator}`)
-        .addField("ID", message.author.id)
-        .addField("Akun Dibuat Pada", `${moment(message.member.user.createdTimestamp).format('LT')}   **|**   ${moment(message.member.user.createdTimestamp).format('LL')}   **|**   ${moment(message.member.user.createdTimestamp).fromNow()}`)
-        .setTimestamp()
-        .setFooter("LALAJOVERS ©️ 2020")
-        message.channel.send(embed)
+      var embed = new Discord.MessageEmbed()
+       .setAuthor("Informasi Account Discord", message.author.displayAvatarURL())
+       .setColor(Math.floor(Math.random() * (0xFFFFFF + 1)))
+       .addField("Nama", `${message.author.username}#${message.author.discriminator}`)
+       .addField("ID", message.author.id)
+       .addField("Akun Dibuat Pada", `${moment(message.member.user.createdTimestamp).format('LT')}   **|**   ${moment(message.member.user.createdTimestamp).format('LL')}   **|**   ${moment(message.member.user.createdTimestamp).fromNow()}`)
+       .setTimestamp()
+       .setFooter("©️ 2020")
+       message.channel.send(embed)
     }
   
-  if (command === "serverinfo") {
-    const roles = message.guild.roles.cache.sort((a, b) => b.position - a.position).map(role => role.toString());
-        const members = message.guild.members.cache;
-    const OnlineMembers = message.guild.members.cache.filter(member => member.presence.status !== "offline").map(member => member.user.username).join(", ");
-    var embed = new Discord.MessageEmbed()
-    .setAuthor(`${message.guild.name}`, "https://images-ext-2.discordapp.net/external/cdyBBW_pON0iBBMN-zKzj693R6hg6Xa6HyYUbJ7FQZI/%3Fsize%3D128/https/cdn.discordapp.com/icons/493895395987030030/82da5579dff96e4c22a7e2cfbab2f13e.png?width=102&height=102", message.guild.iconURL)
-    .setThumbnail('https://images-ext-2.discordapp.net/external/cdyBBW_pON0iBBMN-zKzj693R6hg6Xa6HyYUbJ7FQZI/%3Fsize%3D128/https/cdn.discordapp.com/icons/493895395987030030/82da5579dff96e4c22a7e2cfbab2f13e.png?width=102&height=102')
-    .setColor(Math.floor(Math.random() * (0xFFFFFF + 1)))
-    .setURL(message.guild.URL)
-    .addField(`ID SERVER`, message.guild.id, true)
-    .addField(`OWNER SERVER`, message.guild.owner, true)
-    .addField(`SERVER`, message.guild.region, true)
-    .addField(`TOTAL MEMBER`, `${message.guild.memberCount}`, true)
-    .addField(`JUMLAH ROLE`, `${roles.length}`, true)
-    .setTimestamp()
-    .setFooter("LALAJOVERS ©️ 2020")
-     message.channel.send(embed)
-  }
-
-    if (command === "meme") {
-    const got = require('got'),
-    {MessageEmbed} = require('discord.js');
-    got('https://www.reddit.com/r/meme/random/.json').then(response => {
-      let content = JSON.parse(response.body),
-      image = content[0].data.children[0].data.url,
-      embed = new MessageEmbed()
-      .setColor(Math.floor(Math.random() * (0xFFFFFF + 1)))
-      .setImage(image)
-      .setTimestamp()
-      .setFooter('LALAJOVERS ©️ 2020')
-      message.channel.send(embed);
-    }).catch(console.log)
-  }
-  
+      if (command === "serverinfo") {
+        const roles = message.guild.roles.cache.sort((a, b) => b.position - a.position).map(role => role.toString());
+            const members = message.guild.members.cache;
+        const OnlineMembers = message.guild.members.cache.filter(member => member.presence.status !== "offline").map(member => member.user.username).join(", ");
+        var embed = new Discord.MessageEmbed()
+        .setAuthor(`${message.guild.name}`, "Your Guild Profile Picture", message.guild.iconURL)
+        .setThumbnail('Your Guild Profile Picture')
+        .setColor(Math.floor(Math.random() * (0xFFFFFF + 1)))
+        .setURL(message.guild.URL)
+        .addField(`ID SERVER`, message.guild.id, true)
+        .addField(`OWNER SERVER`, message.guild.owner, true)
+        .addField(`SERVER`, message.guild.region, true)
+        .addField(`TOTAL MEMBER`, `${message.guild.memberCount}`, true)
+        .addField(`JUMLAH ROLE`, `${roles.length}`, true)
+        .setTimestamp()
+        .setFooter("©️ 2020")
+         message.channel.send(embed)
+      }
   
   //announcement script
 
@@ -229,25 +221,54 @@ client.on("message", async message => {
           .setColor(Math.floor(Math.random() * (0xFFFFFF + 1)))
           .setTitle("🚨 **ANNOUNCEMENT** 🚨")
           .setDescription(text);
-          message.channel.send("@everyone")
           message.channel.send(embed);
+          message.channel.send("@everyone")
         }
       }
+  
+      if (command === "meme") {
+        const got = require('got'),
+        {MessageEmbed} = require('discord.js');
+        got('https://www.reddit.com/r/meme/random/.json').then(response => {
+          let content = JSON.parse(response.body),
+          image = content[0].data.children[0].data.url,
+          embed = new MessageEmbed()
+          .setColor(Math.floor(Math.random() * (0xFFFFFF + 1)))
+          .setImage(image)
+          .setTimestamp()
+          .setFooter('©️ 2020')
+          message.channel.send(embed);
+        }).catch(console.log)
+      }
+  
+      if (command === "reaction-roles-embed") {
+        let channel = client.channels.cache.get("Your Channel ID"); // We want to sent the embed, directly to this channel.
+        const embed = new Discord.MessageEmbed()
+        .setColor(0xfc1c03)
+        .setTitle("✅ Ambil Role Kamu Disini ! ✅")
+        .setDescription(`Yang Belum Mendapatkan Role **SUBS** Silahkan Klik Emote ✅ Dibawah`) // We're gonna try an unicode emoji. Let's find it on emojipedia.com !
+        .setTimestamp()
+        .setFooter("©️ 2020")
+          channel.send(embed).then(async msg => {
+          await msg.react("✅");
+          // We're gonna using an await, to make the react are right in order.
+        })
+      }
 
-  if (command === "report") {
-    
+      if (command === "report") {
+        
         message.delete()
-    let target = message.mentions.members.first() || message.guild.members.cache.get(args[0])
-    if(!target) return message.channel.send("Harap sebutkan anggota yang valid dari server ini, Pesan Ini Akan Dihapus Dalam 15 Detik").then(m => m.delete({
-    timeout: 15000}))
-    
-    let reason = args.slice(1).join(" ")
-    if(!reason) return message.channel.send(`Tolong Masukan Alasan Yang Jelas Untuk Melaporkan **${target.user.tag}**`).then(m => m.delete({
-    timeout: 15000}))
-    let sChannel = client.channels.cache.get("745661142298394664")
+        let target = message.mentions.members.first() || message.guild.members.cache.get(args[0])
+        if(!target) return message.channel.send("Harap sebutkan anggota yang valid dari server ini, Pesan Ini Akan Dihapus Dalam 15 Detik").then(m => m.delete({
+        timeout: 15000}))
+        
+        let reason = args.slice(1).join(" ")
+        if(!reason) return message.channel.send(`Tolong Masukan Alasan Yang Jelas Untuk Melaporkan **${target.user.tag}**`).then(m => m.delete({
+        timeout: 15000}))
+        let sChannel = client.channels.cache.get("Your Channel ID") // Your Report Message Channel
 
-    message.channel.send("Laporan Sudah Dikirim Ke Admin, Pesan Ini Akan Dihapus Dalam 15 Detik, Terima Kasih").then(m => m.delete({
-    timeout: 15000}))
+        message.channel.send("Laporan Sudah Dikirim Ke Admin, Pesan Ini Akan Dihapus Dalam 15 Detik, Terima Kasih").then(m => m.delete({
+        timeout: 15000}))
           var embed = new Discord.MessageEmbed()
           .setColor(0xf29100)
           .setTitle("‼️ **REPORT** ‼️")
@@ -259,22 +280,21 @@ client.on("message", async message => {
           .setTimestamp()
           .setFooter("Report System LJV ©️ 2020")
           sChannel.send(embed)
-            .then(function (message) {
-              message.react("✅")
-              message.react("❌")
-            }).catch(function() {
-    })  
-  } 
-
-      if(command === "status") {
-        let days = Math.floor(client.uptime / 86400000);
-        let hours = Math.floor(client.uptime / 3600000) % 24;
-        let minutes = Math.floor(client.uptime / 60000) % 60;
-        let seconds = Math.floor(client.uptime / 1000) % 60;
+          .then(function (message) {
+          message.react("✅")
+          message.react("❌")
+          }).catch(function() {
+        })  
+      } 
     
+      if(command === "status") {
+      let days = Math.floor(client.uptime / 86400000);
+      let hours = Math.floor(client.uptime / 3600000) % 24;
+      let minutes = Math.floor(client.uptime / 60000) % 60;
+      let seconds = Math.floor(client.uptime / 1000) % 60;
         var embed = new Discord.MessageEmbed()
         .setColor(Math.floor(Math.random() * (0xFFFFFF + 1)))
-        .setTitle("🤖  **BOT STATUS**  🤖")
+        .setTitle("🤖  **BOT STATUS UPTIME**  🤖")
         .addField(`📅 Hari`, days)
         .addField(`🕑 Jam`, hours)
         .addField(`🕑 Menit`, minutes)
@@ -284,134 +304,63 @@ client.on("message", async message => {
         .setTimestamp()
         .setFooter("Status System LJV ©️ 2020")
         message.channel.send(embed);
-
       }
-  
-    if (command === "reaction-roles-embed") {
-    let channel = client.channels.cache.get("725978189566050347"); // We want to sent the embed, directly to this channel.
-    const embed = new Discord.MessageEmbed()
-    .setColor(0xfc1c03)
-    .setTitle("✅ Ambil Role Kamu Disini ! ✅")
-    .setDescription(`1️⃣ Team 1\n\n2️⃣ Team 2\n\n3️⃣ Team 3\n\n4️⃣ Team 4\n\n5️⃣ Team 5\n\n6️⃣ Team 6\n\n7️⃣ Team 7\n\n8️⃣ Team 8\n\n9️⃣ Team 9\n\n🔟 Team 10\n\n🔴 Team 11\n\n🟠 Team 12\n\n🟡 Team 13\n\n🟢 Team 14\n\n🔵 Team 15\n\n🟣 Team 16\n\n🟤 Team 17\n\n⚫ Team 18\n\n⚪ Team 19\n\n🔶 Team 20`) // We're gonna try an unicode emoji. Let's find it on emojipedia.com !
-    .addField(`Cara Penggunaan`, "Klik Emoticon Sesuai Emotion Yang Ada Di Samping Nomor Team Masing-Masing, 1 User Hanya Boleh Mengambil 1 Role, Apabila Bingung, Silahkan Bertanya Di <#499840153661997059>\n\nApa Bila Salah Mengambil Role, Klik Kembali Emoticon Team Yang Salah, Kemudian Klik Emoticon Team Yang Benar")
-    .setTimestamp()
-    .setFooter("LALAJO EVENT ©️ 2020")
-    channel.send(embed).then(async msg => {
-      await msg.react("1️⃣");
-      await msg.react("2️⃣");
-      await msg.react("3️⃣");
-      await msg.react("4️⃣");
-      await msg.react("5️⃣");
-      await msg.react("6️⃣");
-      await msg.react("7️⃣");
-      await msg.react("8️⃣");
-      await msg.react("9️⃣");
-      await msg.react("🔟");
-      await msg.react("🔴");
-      await msg.react("🟠");
-      await msg.react("🟡");
-      await msg.react("🟢");
-      await msg.react("🔵");
-      await msg.react("🟣");
-      await msg.react("🟤");
-      await msg.react("⚫");
-      await msg.react("⚪");
-      await msg.react("🔶");
-      // We're gonna using an await, to make the react are right in order.
-    })
-  }
-  
 
-  if(command === "vote") {
-    message.delete().catch(O_o => {});
-    if (message.member.hasPermission("ADMINISTRATOR")) {
-       const text = args.join(" ")
-       if (text.length < 1) return message.channel.send("Silahkan Masukan Pesan");
-       //const colour - args.slice(2).join("");
-       var embed = new Discord.MessageEmbed()
-       .setColor(Math.floor(Math.random() * (0xFFFFFF + 1)))
-       .setTitle("📝 **VOTING** 📝")
-       .setDescription(text)
-       .setTimestamp()
-       .setFooter("Polling System LJV ©️ 2020")
-       message.channel.send(embed)
-       .then(function (message) {
+      if(command === "vote") {
+        message.delete().catch(O_o => {});
+        if (message.member.hasPermission("ADMINISTRATOR")) {
+          const text = args.join(" ")
+          if (text.length < 1) return message.channel.send("Silahkan Masukan Pesan");
+          //const colour - args.slice(2).join("");
+          var embed = new Discord.MessageEmbed()
+          .setColor(Math.floor(Math.random() * (0xFFFFFF + 1)))
+          .setTitle("📝 **VOTING** 📝")
+          .setDescription(text)
+          .setTimestamp()
+          .setFooter("Polling System LJV ©️ 2020")
+        message.channel.send(embed)
+        .then(function (message) {
           message.react("✅")
           message.react("❌")
         }).catch(function() {
       })  
-     }
+      }
     message.channel.send("@everyone")
   }
-  
+
+  //livestream announcement script
+
+  if (command === "live") {
+    message.delete().catch(O_o => {});
+    if (message.member.hasPermission("ADMINISTRATOR")) {
+      const text = args.join(" ")
+      //const colour - args.slice(2).join("");
+      var embed = new Discord.MessageEmbed()
+      .setColor(0xFF1493)
+       //.setTitle("🚨 **STREAM ALERT** 🚨")
+      .setDescription(`Your Link Platform Live Streaming`)
+      .setImage('Your Link Banner ')
+      .setTimestamp()
+      .setFooter("©️ 2021");
+      message.channel.send("@everyone ```css\nYour Description Text```", embed);
+      //message.channel.send(embed);
+    }
+  } 
 });
-
-//bot join to voice script
-
-client.on("ready", () => {
-    const channel = client.channels.cache.get("501292545620443136");
-    if (!channel) return console.error("Saluran tidak ada!");
-    channel.join().then(connection => {
-        console.log("Berhasil terhubung.");
-    }).catch(e => {
-        console.error(e);
-    });
-});
-
-//verification System
-
-const completemsg = `Terima kasih telah menyetujui aturan dan kode etik! Anda sekarang adalah anggota guild yang terverifikasi! \nJangan ragu untuk memilih peran apa yang Anda sukai, perkenalkan diri Anda atau lihat saluran kami yang lain. \n\n**Token unik Anda adalah tanda tangan yang telah Anda baca dan pahami aturan kami.**\n`
-
-const shortcode = (n) => {
-    const possible = 'ABCDEFGHIJKLMNPQRSTUVWXYZabcdefghjklmnopqrstuvwxyz0123456789'
-    let text = ''
-    for (var i = 0; i < n + 1; i++) text += possible.charAt(Math.floor(Math.random() * possible.length))
-    return text;
-}
-
-client.on('guildMemberAdd', (member) => {
-    if (member.user.bot || member.guild.id !== config.guild) return
-    const token = shortcode(8)
-    const welcomemsg = `Selamat datang di Server **LALAJOVERS**! Kami harap Anda menemukan rumah di sini! Lihat \<#499840153661997059>\ saluran untuk memastikan bahwa kami hidup, dan selama tujuan kami sama, maka ada tempat di meja menunggu Anda. \n\n Jika Anda menerima kode etik, harap verifikasi perjanjian Anda dengan membalas ** DM ini ** dengan frasa verifikasi: \n\n\`\`\`Saya setuju untuk mematuhi semua aturan. Token saya adalah ${token}.\`\`\`\n\n**Pesan ini peka terhadap huruf besar-kecil, dan harap sertakan periode di akhir! ** \n\nPertanyaan? Dapatkan di anggota staf di server atau melalui DM.`
-    console.log(`${member.user.username}#${member.user.discriminator} joined! CODE: "${token}"`)
-    member.send(welcomemsg)
-    member.user.token = token
-})
-
-const verifymsg = 'Saya setuju untuk mematuhi semua aturan. Token saya adalah {token}.'
-
-client.on('message', (message) => {
-    if (message.author.bot || !message.author.token || message.channel.type !== `dm`) return
-    if (message.content !== (verifymsg.replace('{token}', message.author.token))) return
-    message.channel.send({
-        embed: {
-            color: Math.floor(Math.random() * (0xFFFFFF + 1)),
-            description: completemsg,
-            timestamp: new Date(),
-            footer: {
-                text: `LALAJOVERS Verification System`
-            }
-        }
-    })
-    client.guilds.cache.get(config.guild).member(message.author).roles.add(config.role) // ensure this is a string in the config ("")
-        .then(console.log(`TOKEN: ${message.author.token} :: Role ${config.role} added to member ${message.author.id}`))
-        .catch(console.error)
-})
 
 // welcome message
-
 client.on('guildMemberAdd', member => {
-  
-  var guilds = client.guilds.cache.get("493895395987030030")
-  var channel = client.channels.cache.get("723434764660375603");
+    
+  var guilds = client.guilds.cache.get("Your Guild ID");
+  var channel = client.channels.cache.get("Your Channel ID");
 
   var embed = new Discord.MessageEmbed()
     .setColor(Math.floor(Math.random() * (0xFFFFFF + 1)))
     .setTitle("✨ Welcome ✨")
-    .setDescription(`Hai ${member.user.tag}, Selamat Datang Di Discord Lalajovers, Silahkan Baca <#495629044243759124> Terlebih Dahulu Yaa, Have Fun And Have A Nice Day, Merci Beaucoup`)
-    .setImage('https://www.gambaranimasi.org/data/media/707/animasi-bergerak-selamat-datang-0031.gif');
+    .setDescription(`Hi **${member.user.tag}**, Your Welcome Message`)
+    .setImage('Your Link Banner');
   channel.send({embed});
-}); 
+});
 
 client.on("messageReactionAdd", async (reaction, user) => {
   // If a message gains a reaction and it is uncached, fetch and cache the message.
@@ -421,89 +370,13 @@ client.on("messageReactionAdd", async (reaction, user) => {
   
   if (user.bot) return; // If the user was a bot, return.
   if (!reaction.message.guild) return; // If the user was reacting something but not in the guild/server, ignore them.
-  if (reaction.message.guild.id !== "499840153192366081") return; // Use this if your bot was only for one server/private server.
+  if (reaction.message.guild.id !== "Your Guild ID") return; // Use this if your bot was only for one server/private server.
   
-  if (reaction.message.channel.id === "725978189566050347") { // This is a #self-roles channel.
-        if (reaction.emoji.name === "1️⃣") {
-      await reaction.message.guild.members.cache.get(user.id).roles.add("751750844155691008"); // Roblox role.
-      return user.send("Role Team 1 Sudah Ditambahkan").catch(() => console.log("Failed to send DM."));
+  if (reaction.message.channel.id === "Your Channel ID") { // This is a #self-roles channel.
+        if (reaction.emoji.name === "✅") {
+      await reaction.message.guild.members.cache.get(user.id).roles.add("494183083629740071"); // Roblox role.
+      return user.send("Your Message").catch(() => console.log("Failed to send DM."));
     }
-        if (reaction.emoji.name === "2️⃣") {
-      await reaction.message.guild.members.cache.get(user.id).roles.add("751750897549312031"); // Roblox role.
-      return user.send("Role Team 2 Sudah Ditambahkan").catch(() => console.log("Failed to send DM."));
-    }
-        if (reaction.emoji.name === "3️⃣") {
-      await reaction.message.guild.members.cache.get(user.id).roles.add("751750844155691008"); // Roblox role.
-      return user.send("Role Team 3 Sudah Ditambahkan").catch(() => console.log("Failed to send DM."));
-    }
-        if (reaction.emoji.name === "4️⃣") {
-      await reaction.message.guild.members.cache.get(user.id).roles.add("751750897549312031"); // Roblox role.
-      return user.send("Role Team 4 Sudah Ditambahkan").catch(() => console.log("Failed to send DM."));
-    }
-        if (reaction.emoji.name === "5️⃣") {
-      await reaction.message.guild.members.cache.get(user.id).roles.add("751750844155691008"); // Roblox role.
-      return user.send("Role Team 5 Sudah Ditambahkan").catch(() => console.log("Failed to send DM."));
-    }
-        if (reaction.emoji.name === "6️⃣") {
-      await reaction.message.guild.members.cache.get(user.id).roles.add("751750897549312031"); // Roblox role.
-      return user.send("Role Team 6 Sudah Ditambahkan").catch(() => console.log("Failed to send DM."));
-    }
-        if (reaction.emoji.name === "7️⃣") {
-      await reaction.message.guild.members.cache.get(user.id).roles.add("751750844155691008"); // Roblox role.
-      return user.send("Role Team 7 Sudah Ditambahkan").catch(() => console.log("Failed to send DM."));
-    }
-        if (reaction.emoji.name === "8️⃣") {
-      await reaction.message.guild.members.cache.get(user.id).roles.add("751750897549312031"); // Roblox role.
-      return user.send("Role Team 8 Sudah Ditambahkan").catch(() => console.log("Failed to send DM."));
-    }
-        if (reaction.emoji.name === "9️⃣") {
-      await reaction.message.guild.members.cache.get(user.id).roles.add("751750844155691008"); // Roblox role.
-      return user.send("Role Team 9 Sudah Ditambahkan").catch(() => console.log("Failed to send DM."));
-    }
-        if (reaction.emoji.name === "🔟") {
-      await reaction.message.guild.members.cache.get(user.id).roles.add("751750897549312031"); // Roblox role.
-      return user.send("Role Team 10 Sudah Ditambahkan").catch(() => console.log("Failed to send DM."));
-    }
-        if (reaction.emoji.name === "🔴") {
-      await reaction.message.guild.members.cache.get(user.id).roles.add("751750844155691008"); // Roblox role.
-      return user.send("Role Team 11 Sudah Ditambahkan").catch(() => console.log("Failed to send DM."));
-    }
-        if (reaction.emoji.name === "🟠") {
-      await reaction.message.guild.members.cache.get(user.id).roles.add("751750844155691008"); // Roblox role.
-      return user.send("Role Team 12 Sudah Ditambahkan").catch(() => console.log("Failed to send DM."));
-    }
-        if (reaction.emoji.name === "🟡") {
-      await reaction.message.guild.members.cache.get(user.id).roles.add("751750897549312031"); // Roblox role.
-      return user.send("Role Team 13 Sudah Ditambahkan").catch(() => console.log("Failed to send DM."));
-    }
-        if (reaction.emoji.name === "🟢") {
-      await reaction.message.guild.members.cache.get(user.id).roles.add("751750844155691008"); // Roblox role.
-      return user.send("Role Team 14 Sudah Ditambahkan").catch(() => console.log("Failed to send DM."));
-    }
-        if (reaction.emoji.name === "🔵") {
-      await reaction.message.guild.members.cache.get(user.id).roles.add("751750897549312031"); // Roblox role.
-      return user.send("Role Team 15 Sudah Ditambahkan").catch(() => console.log("Failed to send DM."));
-    }
-        if (reaction.emoji.name === "🟣") {
-      await reaction.message.guild.members.cache.get(user.id).roles.add("751750844155691008"); // Roblox role.
-      return user.send("Role Team 16 Sudah Ditambahkan").catch(() => console.log("Failed to send DM."));
-    }
-        if (reaction.emoji.name === "🟤") {
-      await reaction.message.guild.members.cache.get(user.id).roles.add("751750897549312031"); // Roblox role.
-      return user.send("Role Team 17 Sudah Ditambahkan").catch(() => console.log("Failed to send DM."));
-    }
-        if (reaction.emoji.name === "⚫") {
-      await reaction.message.guild.members.cache.get(user.id).roles.add("751750844155691008"); // Roblox role.
-      return user.send("Role Team 18 Sudah Ditambahkan").catch(() => console.log("Failed to send DM."));
-    }
-        if (reaction.emoji.name === "⚪") {
-      await reaction.message.guild.members.cache.get(user.id).roles.add("751750897549312031"); // Roblox role.
-      return user.send("Role Team 19 Sudah Ditambahkan").catch(() => console.log("Failed to send DM."));
-    }
-        if (reaction.emoji.name === "🔶") {
-      await reaction.message.guild.members.cache.get(user.id).roles.add("751750844155691008"); // Roblox role.
-      return user.send("Role Team 20 Sudah Ditambahkan").catch(() => console.log("Failed to send DM."));
-    }  
   } else {
     return; // If the channel was not a #self-roles, ignore them.
   }
@@ -517,109 +390,35 @@ client.on("messageReactionRemove", async (reaction, user) => {
   
   if (user.bot) return;
   if (!reaction.message.guild) return;
-  if (reaction.message.guild.id !== "499840153192366081") return;
+  if (reaction.message.guild.id !== "Your Channel ID") return;
   
-  if (reaction.message.channel.id === "725978189566050347") {
-        if (reaction.emoji.name === "1️⃣") {
-      await reaction.message.guild.members.cache.get(user.id).roles.remove("751750844155691008"); // Roblox role.
-      return user.send("Role Team 1 Sudah Dilepas").catch(() => console.log("Failed to send DM."));
+  if (reaction.message.channel.id === "Your Channel ID") {
+        if (reaction.emoji.name === "✅") {
+      await reaction.message.guild.members.cache.get(user.id).roles.remove("494183083629740071"); // Roblox role.
+      return user.send("Your Message").catch(() => console.log("Failed to send DM."));
     }
-        if (reaction.emoji.name === "2️⃣") {
-      await reaction.message.guild.members.cache.get(user.id).roles.remove("751750897549312031"); // Roblox role.
-      return user.send("Role Team 2 Sudah Dilepas").catch(() => console.log("Failed to send DM."));
-    }
-        if (reaction.emoji.name === "3️⃣") {
-      await reaction.message.guild.members.cache.get(user.id).roles.remove("751750844155691008"); // Roblox role.
-      return user.send("Role Team 3 Sudah Dilepas").catch(() => console.log("Failed to send DM."));
-    }
-        if (reaction.emoji.name === "4️⃣") {
-      await reaction.message.guild.members.cache.get(user.id).roles.remove("751750897549312031"); // Roblox role.
-      return user.send("Role Team 4 Sudah Dilepas").catch(() => console.log("Failed to send DM."));
-    }
-        if (reaction.emoji.name === "5️⃣") {
-      await reaction.message.guild.members.cache.get(user.id).roles.remove("751750844155691008"); // Roblox role.
-      return user.send("Role Team 5 Sudah Dilepas").catch(() => console.log("Failed to send DM."));
-    }
-        if (reaction.emoji.name === "6️⃣") {
-      await reaction.message.guild.members.cache.get(user.id).roles.remove("751750897549312031"); // Roblox role.
-      return user.send("Role Team 6 Sudah Dilepas").catch(() => console.log("Failed to send DM."));
-    }
-        if (reaction.emoji.name === "7️⃣") {
-      await reaction.message.guild.members.cache.get(user.id).roles.remove("751750844155691008"); // Roblox role.
-      return user.send("Role Team 7 Sudah Dilepas").catch(() => console.log("Failed to send DM."));
-    }
-        if (reaction.emoji.name === "8️⃣") {
-      await reaction.message.guild.members.cache.get(user.id).roles.remove("751750897549312031"); // Roblox role.
-      return user.send("Role Team 8 Sudah Dilepas").catch(() => console.log("Failed to send DM."));
-    }
-        if (reaction.emoji.name === "9️⃣") {
-      await reaction.message.guild.members.cache.get(user.id).roles.remove("751750844155691008"); // Roblox role.
-      return user.send("Role Team 9 Sudah Dilepas").catch(() => console.log("Failed to send DM."));
-    }
-        if (reaction.emoji.name === "🔟") {
-      await reaction.message.guild.members.cache.get(user.id).roles.remove("751750897549312031"); // Roblox role.
-      return user.send("Role Team 10 Sudah Dilepas").catch(() => console.log("Failed to send DM."));
-    }
-        if (reaction.emoji.name === "🔴") {
-      await reaction.message.guild.members.cache.get(user.id).roles.remove("751750844155691008"); // Roblox role.
-      return user.send("Role Team 11 Sudah Dilepas").catch(() => console.log("Failed to send DM."));
-    }
-        if (reaction.emoji.name === "🟠") {
-      await reaction.message.guild.members.cache.get(user.id).roles.remove("751750844155691008"); // Roblox role.
-      return user.send("Role Team 12 Sudah Dilepas").catch(() => console.log("Failed to send DM."));
-    }
-        if (reaction.emoji.name === "🟡") {
-      await reaction.message.guild.members.cache.get(user.id).roles.remove("751750897549312031"); // Roblox role.
-      return user.send("Role Team 13 Sudah Dilepas").catch(() => console.log("Failed to send DM."));
-    }
-        if (reaction.emoji.name === "🟢") {
-      await reaction.message.guild.members.cache.get(user.id).roles.remove("751750844155691008"); // Roblox role.
-      return user.send("Role Team 14 Sudah Dilepas").catch(() => console.log("Failed to send DM."));
-    }
-        if (reaction.emoji.name === "🔵") {
-      await reaction.message.guild.members.cache.get(user.id).roles.remove("751750897549312031"); // Roblox role.
-      return user.send("Role Team 15 Sudah Dilepas").catch(() => console.log("Failed to send DM."));
-    }
-        if (reaction.emoji.name === "🟣") {
-      await reaction.message.guild.members.cache.get(user.id).roles.remove("751750844155691008"); // Roblox role.
-      return user.send("Role Team 16 Sudah Dilepas").catch(() => console.log("Failed to send DM."));
-    }
-        if (reaction.emoji.name === "🟤") {
-      await reaction.message.guild.members.cache.get(user.id).roles.remove("751750897549312031"); // Roblox role.
-      return user.send("Role Team 17 Sudah Dilepas").catch(() => console.log("Failed to send DM."));
-    }
-        if (reaction.emoji.name === "⚫") {
-      await reaction.message.guild.members.cache.get(user.id).roles.remove("751750844155691008"); // Roblox role.
-      return user.send("Role Team 18 Sudah Dilepas").catch(() => console.log("Failed to send DM."));
-    }
-        if (reaction.emoji.name === "⚪") {
-      await reaction.message.guild.members.cache.get(user.id).roles.remove("751750897549312031"); // Roblox role.
-      return user.send("Role Team 19 Sudah Dilepas").catch(() => console.log("Failed to send DM."));
-    }
-        if (reaction.emoji.name === "🔶") {
-      await reaction.message.guild.members.cache.get(user.id).roles.remove("751750844155691008"); // Roblox role.
-      return user.send("Role Team 20 Sudah Dilepas").catch(() => console.log("Failed to send DM."));
-    }  
   } else {
     return;
   }
 })
 
-// Check every 30 seconds for changes
+// Check every 5 seconds for changes
+
 setInterval(function() {
-  console.log('Member Count Dimulai')
 
 // update member
-let guild = client.guilds.cache.get("499840153192366081");
-let memberCount = guild.memberCount
-let memberCountChannel = client.channels.cache.get("752509009289805884")
-let botCountChannel = client.channels.cache.get("752509038863974533");
-  
-const userCount = guild.members.cache.filter(member => !member.user.bot).size  
-memberCountChannel.setName(`〘👤〙Jumlah User: ${memberCount}`)
-  
-const botCount = guild.members.cache.filter(member => member.user.bot).size  
-botCountChannel.setName(`〘🤖〙Jumlah Bot: ${botCount}`)
-}, 15000);
 
-client.login(config.token);
+// now you can log computers to find out what you wanna do with it next.
+let guild = client.guilds.cache.get("Your Guild ID");
+let memberCount = guild.memberCount
+let memberCountChannel = client.channels.cache.get("Your Voice Channel ID For User Count")
+let botCountChannel = client.channels.cache.get("Your Voice Channel ID For Bots Count");
+  
+const userCount = guild.members.cache.filter(member => !member.user.bot).size;
+memberCountChannel.setName(`〘👤〙User: ${memberCount}`)
+  
+const botCount = guild.members.cache.filter(member => member.user.bot).size;
+botCountChannel.setName(`〘🤖〙Bot: ${botCount}`)
+}, 5000);
+
+client.login(config.token, 'reconnect=True', 'bot=True'); 
