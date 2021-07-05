@@ -30,10 +30,21 @@ const moment = require('moment');
 const { Command } = require('discord.js-commando')
 client.on('ready', () => console.log(`Aktif Sebagai ${client.user.tag}.`));
 
-client.on('ready', () => {
-    console.log(`Bot ${client.user.tag} Sudah Menyala`);
-    //client.user.setActivity('🔧 MAINTENANCE | Optimize Script', { type: 'WATCHING'});
-});
+const presence = [
+  `Presence 1`, // Presence 1
+  `Presence 2`, // Presence 2
+  `Presence 3`, // Presence 3
+  `Presence 4` // Presence 4 | Presence Akan Berganti-ganti, silahkan sesuaikan sendiri
+];
+
+let index = 0;
+setInterval(() => {
+  if(index === presence.length) index = 0;
+  const status = presence[index];
+  console.log('Memperbarui Presence');
+  client.user.setActivity(status, { type: 'WATCHING'});
+  index++;
+}, 5000)
 
 //antispam script
 client.on('message', (message) => antiSpam.message(message));
