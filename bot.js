@@ -78,6 +78,18 @@ bot.on('guildMemberAdd', member => {
 })
 
 client.on("message", async message => {
+  let blacklisted = ['word 1', 'word 2'];
+  let foundInText = false;
+  for (var i in blacklisted) {
+    if (message.content.toLowerCase().includes(blacklisted[i].toLowerCase())) foundInText = true;
+    }
+    if (foundInText) {
+      message.delete();
+      message.channel.send(`${message.author} Kalimat Kamu Merupakan Blacklisted Word, Pesanmu Dihapus`).then(m => m.delete({timeout: 15000})) // to reply if someone send blacklisted word
+    }
+})
+
+client.on("message", async message => {
     if (message.author.bot) return;
 
     if (!message.content.startsWith(config.prefix)) return;
